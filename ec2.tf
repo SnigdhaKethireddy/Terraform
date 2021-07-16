@@ -83,6 +83,7 @@ resource "aws_instance" "ec2" {
   ami           = "" 
   instance_type = var.instance
   availability_zone = "us-east-1a"
+  iam_instance_profile = aws_iam_instance_profile.test_profile.name
   key =""
 
   network_interface {
@@ -99,4 +100,62 @@ resource "aws_instance" "ec2" {
                EOF
 }
 
+
+///////////////
+
+resource "aws_s3_bucket" "b" {
+  bucket = "web server-1"
+  acl    = "public"
+
+  versioning {
+    enabled = true
+  }
+}
+
+resource "aws_iam_role" "test_role" {
+  name = "test_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+//ec2 instane profile
+
+resource "aws_iam_instance_profile" "test_profile" {
+  name = "test_profile"
+  role = aws_iam_role.test_role.name
+}
+
+resource "aws_iam_role_policy" "test_policy" {
+  name = "test_policy"
+  role = aws_iam_role.test_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "s3:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
 
