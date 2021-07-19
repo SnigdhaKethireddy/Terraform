@@ -22,14 +22,7 @@ resource "aws_launch_configuration" "as_conf" {
   image_id      = "ami-09e67e426f25ce0d7"
   instance_type = var.size
   security_groups = [aws_security_group.allow_tls.id]
-  user_data = <<-EOF
-                #!/bin/bash
-                sudo su
-                yum -y install http
-                echo "<p> My Instance! </p>" >> /var/www/html/index.html
-                sudo systemctl enable http
-                sudo systemctl start http
-               EOF
+  
   lifecycle {
     create_before_destroy = true
   }
