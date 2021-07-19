@@ -115,14 +115,6 @@ resource "aws_instance" "ec2" {
 
   }
 
-  user_data = <<-EOF
-                #!/bin/bash
-                sudo su
-                yum -y install http
-                echo "<p> My Instance! </p>" >> /var/www/html/index.html
-                sudo systemctl enable http
-                sudo systemctl start http
-               EOF
 }
 
 
