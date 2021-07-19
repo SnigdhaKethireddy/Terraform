@@ -1,30 +1,41 @@
 #define ami
-data "aws_ami" "example" {
-  executable_users = ["self"]
-  most_recent      = true
-  owners           = ["self"]
+
+data "aws_ami_ids" "ubuntu" {
+  owners = ["099720109477"]
 
   filter {
     name   = "name"
-    values = ["********"]
+    values = ["ubuntu/images/ubuntu-*-*-amd64-server-*"]
   }
-
 }
 
-resource "aws_key" "pair" {
-  key_name = "pair"
-  public_key = "********8"
+resource "aws_key_pair" "my_aws_key" {
+  key_name = "my_aws_key"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD3F6tyPEFEzV0LX3X8BsXdMsQz1x2cEikKDEY0aIj41qgxMCP/iteneqXSIFZBp5vizPvaoIR3Um9xK7PGoW8giupGn+EPuxIA4cDM4vzOqOkiMPhz5XK0whEjkVzTo4+S0puvDZuwIsdiW9mxhJc7tgBNL0cYlWSYVkz4G/fslNfRPW5mYAM49f4fhtxPb5ok4Q2Lg9dPKVHO/Bgeu5woMc7RY0p1ej6D4CKFE6lymSDJpW0YHX/wqE9+cfEauh7xZcG0q9t2ta6F6fmX0agvpFyZo8aFbXeUBr7osSCJNgvavWbM/06niWrOvYX2xwWdhXmXSrbX8ZbabVohBK41 email@example.com"
 }
 
 
 #define autosscaling launch config
 
 resource "aws_launch_configuration" "as_conf" {
-  name          = "as_conf"
-  image_id      = data.aws_ami.example.id
-  instance_type = var.instance
-
+  name          = "practice"
+  image_id      = "ami-09e67e426f25ce0d7"
+  instance_type = var.size
+  security_groups = [aws_security_group.allow_tls.id]
+  user_data = <<-EOF
+                #!/bin/bash
+                sudo su
+                yum -y install http
+                echo "<p> My Instance! </p>" >> /var/www/html/index.html
+                sudo systemctl enable http
+                sudo systemctl start http
+               EOF
+  lifecycle {
+    create_before_destroy = true
+  }
 }
+
+
 #define autoscaling group
 resource "aws_autoscaling_group" "scale" {
   name                      = "scale"
@@ -46,8 +57,8 @@ resource "aws_autoscaling_policy" "pol" {
   autoscaling_group_name = aws_autoscaling_group.scale.name
 }
 #define cloud watch monitoring
-resource "aws_cloudwatch_metric_alarm" "cloud" {
-  alarm_name          = "cloud"
+resource "aws_cloudwatch_metric_alarm" "cloud1" {
+  alarm_name          = "cloud1"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
