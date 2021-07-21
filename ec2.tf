@@ -100,7 +100,7 @@ resource "aws_instance" "ec2" {
   instance_type = var.size
   availability_zone = "us-east-1a"
   iam_instance_profile = aws_iam_instance_profile.test_profile.name
-  key_name ="my_aws_key"
+  key_name ="my_key"
   
 
   network_interface {
@@ -123,13 +123,13 @@ resource "aws_instance" "ec2" {
 
 #create s3 bucket
 resource "aws_s3_bucket" "b1" {
-  bucket = "for-practice-aws-0"
+  bucket = "for-practice-aws-1"
   acl    = "public-read"
 }
 
 #assign iam role
 resource "aws_iam_role" "test_role" {
-  name = "test_role"
+  name = "test1_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -149,7 +149,7 @@ resource "aws_iam_role" "test_role" {
 //ec2 instane profile
 
 resource "aws_iam_instance_profile" "test_profile" {
-  name = "test_profile"
+  name = "test_profile1"
   role = aws_iam_role.test_role.name
 }
 
