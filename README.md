@@ -14,7 +14,7 @@ elb.tf-load balancer
 
 #create a vpc
 #create internet gateway 
-# create custom route table
+#create custom route table
 #create subnet
 #associate subnet with route table
 #create security group allow port 80
