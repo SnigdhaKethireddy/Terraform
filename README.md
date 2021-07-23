@@ -21,8 +21,10 @@ elb.tf-load balancer
 #create network interface
 #assign eip to network interface
 #create a server install apache
-#run userdata script
+#run userdata script- installed a server 
 #create s3 bucket
 #assign iam role
 #ec2 instane profile
 #assign policy
+
+After these steps are done, when we use the public ip address, it opens a http website index.html file which says welcome to accendero
